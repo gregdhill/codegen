@@ -84,7 +84,13 @@ impl Impl {
     }
 
     /// Set an associated constant.
-    pub fn associate_const<T>(&mut self, name: &str, ty: T, value: &str) -> &mut Self
+    pub fn associate_const<T>(
+        &mut self,
+        name: &str,
+        ty: T,
+        value: &str,
+        visibility: &str,
+    ) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -94,6 +100,7 @@ impl Impl {
             documentation: Vec::new(),
             annotation: Vec::new(),
             value: value.to_string(),
+            visibility: Some(visibility.to_string()),
         });
 
         self
@@ -110,6 +117,7 @@ impl Impl {
             documentation: Vec::new(),
             annotation: Vec::new(),
             value: String::new(),
+            visibility: None,
         });
 
         self
@@ -162,6 +170,9 @@ impl Impl {
             // format associated constants
             if !self.assoc_csts.is_empty() {
                 for cst in &self.assoc_csts {
+                    if let Some(vis) = &cst.visibility {
+                        write!(fmt, "{} ", vis)?;
+                    }
                     write!(fmt, "const {}: ", cst.name)?;
                     cst.ty.fmt(fmt)?;
                     write!(fmt, " = {};\n", cst.value)?;
