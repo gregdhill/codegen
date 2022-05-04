@@ -605,3 +605,30 @@ enum IpAddrKind {
 
     assert_eq!(scope.to_string(), &expect[1..]);
 }
+
+#[test]
+fn impl_with_associated_const() {
+    let mut scope = Scope::new();
+
+    let mut bar = scope.new_trait("Bar");
+    bar.associated_const("CONST_NAME", Type::new("f32"));
+
+    let mut foo = scope.new_struct("Foo");
+
+    let mut foo_impl = scope.new_impl("Foo");
+    foo_impl.impl_trait("Bar");
+    foo_impl.associate_const("CONST_NAME", Type::new("f32"), "0.0");
+
+    let expect = r#"
+trait Bar {
+    const CONST_NAME: f32;
+}
+
+struct Foo;
+
+impl Bar for Foo {
+    const CONST_NAME: f32 = 0.0;
+}"#;
+
+    assert_eq!(scope.to_string(), &expect[1..]);
+}
